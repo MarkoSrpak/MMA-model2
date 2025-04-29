@@ -50,3 +50,10 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Aditional ignores
+.vscode/
+build/
+sdkconfig
+sdkconfig.old
+dependencies.lock
