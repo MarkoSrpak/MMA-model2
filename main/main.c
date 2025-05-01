@@ -7,8 +7,10 @@
 /*--------------------------- INCLUDES ---------------------------------------*/
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "led_rgb.h"
 #include <stdio.h>
+
+#include "led_rgb.h"
+#include "sweat_sensor.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
 /*--------------------------- STATIC FUNCTION PROTOTYPES ---------------------*/
@@ -19,6 +21,7 @@ void app_main(void)
 {
     // Initialize the LED RGB module
     led_rgb_init();
+    sweat_init();
 
     uint32_t ledId = 0; // Assuming a single LED for simplicity
 
@@ -38,7 +41,8 @@ void app_main(void)
         // Turn the LED off
         led_rgb_off(ledId);
         vTaskDelay(pdMS_TO_TICKS(500));
-        printf("Hello, FreeRTOS!\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        printf("Sweat sensor value: %d\n", sweat_read());
+        // printf("Hello, FreeRTOS!\n");
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
