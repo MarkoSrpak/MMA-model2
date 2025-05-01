@@ -53,6 +53,10 @@ void led_rgb_init(void)
     // Clear LED strip
     memset(led_strip_pixels, 0, sizeof(led_strip_pixels));
     ESP_LOGI(TAG, "RGB LED strip initialized");
+
+    for (int i = 0; i < LED_RGB_MAX; i++) {
+        led_rgb_off(i); // Set all LEDs to off
+    }
 }
 
 void led_rgb_set_color(uint32_t ledId, uint32_t r, uint32_t g, uint32_t b)
