@@ -4,16 +4,14 @@
  *
  */
 
-#ifndef BME_H
-#define BME_H
+#ifndef SDCARD_TASK_H
+#define SDCARD_TASK_H
 
 /*--------------------------- INCLUDES ---------------------------------------*/
-#include "esp_err.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
 /*--------------------------- EXTERN -----------------------------------------*/
 /*--------------------------- GLOBAL FUNCTION PROTOTYPES ---------------------*/
-int bme_read(double *temp, double *humidity, double *pressure, double *voc);
-int bme_start_measurement();
+void sdcard_task(void *pvParameters);
 
-#endif /*BME_H*/
+#endif /*SDCARD_TASK_H*/

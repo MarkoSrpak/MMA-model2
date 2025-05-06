@@ -12,6 +12,7 @@
 #include "bme_task.h"
 #include "i2c.h"
 #include "led_rgb.h"
+#include "sdcard_task.h"
 #include "sweat_sensor.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
@@ -27,6 +28,7 @@ void app_main(void)
 
     // Create a task for BME68x initialization
     xTaskCreate(bme68x_task, "BME68x Task", 4096, NULL, 5, NULL);
+    xTaskCreate(sdcard_task, "SD Card Task", 4096, NULL, 5, NULL);
 
     uint32_t ledId = 0; // Assuming a single LED for simplicity
 
