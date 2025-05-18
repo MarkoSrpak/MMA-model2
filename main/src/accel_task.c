@@ -10,8 +10,8 @@
 #include "freertos/task.h"
 #include <stdio.h>
 
-#include "accelGY.h"
-#include "accelGY_task.h"
+#include "accel.h"
+#include "accel_task.h"
 #include "i2c.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
@@ -19,7 +19,7 @@
 /*--------------------------- VARIABLES --------------------------------------*/
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
 /*--------------------------- GLOBAL FUNCTIONS -------------------------------*/
-void accelGY_task(void *pvParameters)
+void accel_task(void *pvParameters)
 {
     // Initialize I2C
     if (I2C_init() != ESP_OK) {
@@ -27,19 +27,19 @@ void accelGY_task(void *pvParameters)
         vTaskDelete(NULL);
     }
 
-    accelGY_data_t data;
-    accelGY_init();
+    // accelGY_data_t data;
+    accel_init();
 
     while (1) {
-        accelGY_read(&data);
+        // accelGY_read(&data);
 
         // printf("Accel: X=%d Y=%d Z=%d\n", data.accel_x, data.accel_y,
         // data.accel_z);
         // printf("Temp: %d\n", data.temp);
         // printf("Gyro: X=%d Y=%d Z=%d\n", data.gyro_x, data.gyro_y,
         // data.gyro_z);
-        printf("%d %d %d\n", data.gyro_x, data.gyro_y, data.gyro_z);
+        // printf("%d %d %d\n", data.gyro_x, data.gyro_y, data.gyro_z);
 
-        vTaskDelay(pdMS_TO_TICKS(300));
+        vTaskDelay(pdMS_TO_TICKS(3000));
     }
 }

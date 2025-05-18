@@ -10,9 +10,11 @@
 #include <stdio.h>
 
 #include "accelGY_task.h"
+#include "accel_task.h"
 #include "bme_task.h"
 #include "i2c.h"
 #include "led_rgb.h"
+#include "microphone.h"
 #include "pwm.h"
 #include "sdcard_task.h"
 #include "sweat_sensor.h"
@@ -27,11 +29,13 @@ void app_main(void)
     // Initialize the LED RGB module
     // led_rgb_init();
     // sweat_init();
+    mic_init();
     pwm_init(ID_BUZZER); // Initialize the buzzer
     // Create a task for BME68x initialization
-    xTaskCreate(bme68x_task, "BME68x Task", 4096, NULL, 5, NULL);
+    // xTaskCreate(bme68x_task, "BME68x Task", 4096, NULL, 5, NULL);
     xTaskCreate(sdcard_task, "SD Card Task", 4096, NULL, 5, NULL);
     // xTaskCreate(accelGY_task, "AccelGY Task", 4096, NULL, 5, NULL);
+    xTaskCreate(accel_task, "Accel Task", 4096, NULL, 5, NULL);
 
     // uint32_t ledId = 0; // Assuming a single LED for simplicity
 
@@ -54,8 +58,10 @@ void app_main(void)
         // printf("Sweat sensor value: %d\n", sweat_read());
         //  printf("Hello, FreeRTOS!\n");
         // pwm_on_perc(ID_BUZZER, 50);
-        vTaskDelay(pdMS_TO_TICKS(500));
-        pwm_off(ID_BUZZER);
-        vTaskDelay(pdMS_TO_TICKS(500));
+        // vTaskDelay(pdMS_TO_TICKS(500));
+        // pwm_off(ID_BUZZER);
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        // printf("Mic sensor value: %d\n", mic_read());
+        // printf("%d\n", mic_read());
     }
 }

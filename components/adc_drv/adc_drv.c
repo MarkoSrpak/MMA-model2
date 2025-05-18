@@ -60,6 +60,6 @@ int adc_read(uint8_t unit, int channel)
     int raw_data;
     adc_oneshot_read(adc_handles[unit - 1], channel, &raw_data);
     // printf("Raw data channel: %d, data: %d\n", channel, raw_data);
-    // return raw_data;
-    return ((raw_data * 100) / 4095);
+    return raw_data;
+    // return ((raw_data * 100) / 4095);
 }
