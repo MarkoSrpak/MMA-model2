@@ -9,9 +9,11 @@
 #include "freertos/task.h"
 #include <stdio.h>
 
+#include "accelGY_task.h"
 #include "bme_task.h"
 #include "i2c.h"
 #include "led_rgb.h"
+#include "pwm.h"
 #include "sdcard_task.h"
 #include "sweat_sensor.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
@@ -23,14 +25,15 @@
 void app_main(void)
 {
     // Initialize the LED RGB module
-    led_rgb_init();
-    sweat_init();
-
+    // led_rgb_init();
+    // sweat_init();
+    pwm_init(ID_BUZZER); // Initialize the buzzer
     // Create a task for BME68x initialization
     xTaskCreate(bme68x_task, "BME68x Task", 4096, NULL, 5, NULL);
     xTaskCreate(sdcard_task, "SD Card Task", 4096, NULL, 5, NULL);
+    // xTaskCreate(accelGY_task, "AccelGY Task", 4096, NULL, 5, NULL);
 
-    uint32_t ledId = 0; // Assuming a single LED for simplicity
+    // uint32_t ledId = 0; // Assuming a single LED for simplicity
 
     while (true) {
         /*  // Alternate between red, green, and blue
@@ -48,8 +51,11 @@ void app_main(void)
           // Turn the LED off
           led_rgb_off(ledId);
           vTaskDelay(pdMS_TO_TICKS(500));*/
-        printf("Sweat sensor value: %d\n", sweat_read());
-        // printf("Hello, FreeRTOS!\n");
-        vTaskDelay(pdMS_TO_TICKS(5000));
+        // printf("Sweat sensor value: %d\n", sweat_read());
+        //  printf("Hello, FreeRTOS!\n");
+        // pwm_on_perc(ID_BUZZER, 50);
+        vTaskDelay(pdMS_TO_TICKS(500));
+        pwm_off(ID_BUZZER);
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
