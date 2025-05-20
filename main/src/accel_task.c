@@ -27,19 +27,17 @@ void accel_task(void *pvParameters)
         vTaskDelete(NULL);
     }
 
-    // accelGY_data_t data;
+    accel_data_t data;
     accel_init();
 
     while (1) {
-        // accelGY_read(&data);
+        accel_read(&data);
 
-        // printf("Accel: X=%d Y=%d Z=%d\n", data.accel_x, data.accel_y,
-        // data.accel_z);
-        // printf("Temp: %d\n", data.temp);
-        // printf("Gyro: X=%d Y=%d Z=%d\n", data.gyro_x, data.gyro_y,
-        // data.gyro_z);
-        // printf("%d %d %d\n", data.gyro_x, data.gyro_y, data.gyro_z);
+        printf("Accel: X=%d Y=%d Z=%d\n", data.accel_x, data.accel_y,
+               data.accel_z);
+        printf("Gyro: X=%d Y=%d Z=%d\n", data.gyro_x, data.gyro_y, data.gyro_z);
+        printf("Mag: X=%d Y=%d Z=%d\n", data.mag_x, data.mag_y, data.mag_z);
 
-        vTaskDelay(pdMS_TO_TICKS(3000));
+        vTaskDelay(pdMS_TO_TICKS(300));
     }
 }
