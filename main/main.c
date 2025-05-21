@@ -11,6 +11,7 @@
 
 #include "accelGY_task.h"
 #include "accel_task.h"
+#include "ble_task.h"
 #include "bme_task.h"
 #include "gps_task.h"
 #include "i2c.h"
@@ -39,32 +40,33 @@ void app_main(void)
     xTaskCreate(accel_task, "Accel Task", 4096, NULL, 5, NULL);
 
     xTaskCreate(gps_task, "GPS Task", 4096, NULL, 5, NULL);
+    xTaskCreatePinnedToCore(ble_task, "GPS Task", 4096, NULL, 5, NULL, 0);
 
     // uint32_t ledId = 2; // Assuming a single LED for simplicity
 
     while (true) {
-        // Alternate between red, green, and blue
-        for (int ledId = 0; ledId < 9; ledId++) {
-            led_rgb_set_color(ledId, 255, 0, 0); // Red
-            vTaskDelay(pdMS_TO_TICKS(500));
+        /*   // Alternate between red, green, and blue
+           for (int ledId = 0; ledId < 9; ledId++) {
+               led_rgb_set_color(ledId, 255, 0, 0); // Red
+               vTaskDelay(pdMS_TO_TICKS(500));
 
-            led_rgb_set_color(ledId, 0, 255, 0); // Green
-            vTaskDelay(pdMS_TO_TICKS(500));
+               led_rgb_set_color(ledId, 0, 255, 0); // Green
+               vTaskDelay(pdMS_TO_TICKS(500));
 
-            led_rgb_set_color(ledId, 0, 0, 255); // Blue
-            vTaskDelay(pdMS_TO_TICKS(500));
+               led_rgb_set_color(ledId, 0, 0, 255); // Blue
+               vTaskDelay(pdMS_TO_TICKS(500));
 
-            led_rgb_on(ledId); // White
-            vTaskDelay(pdMS_TO_TICKS(500));
-            // Turn the LED off
-            led_rgb_off(ledId);
-            vTaskDelay(pdMS_TO_TICKS(500));
-        }
-        // printf("Sweat sensor value: %d\n", sweat_read());
-        //  printf("Hello, FreeRTOS!\n");
-        // pwm_on_perc(ID_BUZZER, 50);
-        // vTaskDelay(pdMS_TO_TICKS(500));
-        // pwm_off(ID_BUZZER);
+               led_rgb_on(ledId); // White
+               vTaskDelay(pdMS_TO_TICKS(500));
+               // Turn the LED off
+               led_rgb_off(ledId);
+               vTaskDelay(pdMS_TO_TICKS(500));
+           }
+           // printf("Sweat sensor value: %d\n", sweat_read());
+           //  printf("Hello, FreeRTOS!\n");
+           // pwm_on_perc(ID_BUZZER, 50);
+           // vTaskDelay(pdMS_TO_TICKS(500));
+           // pwm_off(ID_BUZZER);*/
         vTaskDelay(pdMS_TO_TICKS(2000));
         // printf("Mic sensor value: %d\n", mic_read());
         // printf("%d\n", mic_read());

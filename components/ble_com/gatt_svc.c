@@ -6,17 +6,24 @@
 /* Includes */
 #include "gatt_svc.h"
 #include "common.h"
+#include "freertos/queue.h"
+
+static const char *TAG = "NimBLE_GATT";
 
 /* Private function declarations */
 static int custom_chr_access(uint16_t conn_handle, uint16_t attr_handle,
                              struct ble_gatt_access_ctxt *ctxt, void *arg);
 /* Private variables */
-static const ble_uuid16_t custom_svc_uuid =
-    BLE_UUID16_INIT(0x181C); // example 16-bit UUID (User Data)
-static const ble_uuid16_t custom_chr_uuid =
-    BLE_UUID16_INIT(0x2A8A); // example characteristic UUID (Custom)
+static const ble_uuid128_t custom_svc_uuid =
+    BLE_UUID128_INIT(0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0xfe, 0xdc,
+                     0xba, 0x09, 0x87, 0x65, 0x43, 0x21); // Service UUID
 
-static uint8_t custom_chr_val[20] = {0}; // buffer for read/write data
+static const ble_uuid128_t custom_chr_uuid =
+    BLE_UUID128_INIT(0xde, 0xad, 0xbe, 0xef, 0xca, 0xfe, 0xba, 0xbe, 0xbe, 0xba,
+                     0xfe, 0xed, 0xfa, 0xce, 0x12, 0x34); // Characteristic UUID
+
+static uint8_t custom_chr_val[BLE_QUEUE_ITEM_MAX_LEN] = {
+    0}; // buffer for read/write data
 static uint16_t custom_chr_val_handle;
 
 static uint16_t custom_chr_conn_handle = BLE_HS_CONN_HANDLE_NONE;
@@ -36,12 +43,37 @@ static const struct ble_gatt_svc_def gatt_svr_svcs[] = {
                              | BLE_GATT_CHR_F_NOTIFY,
                     .val_handle = &custom_chr_val_handle,
                 },
-                {0}},
+                {0} // End
+            },
     },
-    {
-        0, /* No more services. */
-    },
+    {0} // No more services
 };
+
+void send_ble_notification(const uint8_t *data, uint16_t len)
+{
+    if (!custom_chr_notify_enabled
+        || custom_chr_conn_handle == BLE_HS_CONN_HANDLE_NONE) {
+        ESP_LOGW("BLE_NOTIFY",
+                 "Cannot notify: not subscribed or invalid connection");
+        return;
+    }
+
+    // Create an mbuf for the notification payload
+    struct os_mbuf *om = ble_hs_mbuf_from_flat(data, len);
+    if (!om) {
+        ESP_LOGE("BLE_NOTIFY", "Failed to allocate mbuf for notification");
+        return;
+    }
+
+    // Send the notification
+    int rc = ble_gatts_notify_custom(custom_chr_conn_handle,
+                                     custom_chr_val_handle, om);
+    if (rc != 0) {
+        ESP_LOGE("BLE_NOTIFY", "Notification failed, rc=%d", rc);
+    } else {
+        ESP_LOGI("BLE_NOTIFY", "Notification sent: %.*s", len, data);
+    }
+}
 
 /* characteristic access callback */
 static int custom_chr_access(uint16_t conn_handle, uint16_t attr_handle,
@@ -59,8 +91,18 @@ static int custom_chr_access(uint16_t conn_handle, uint16_t attr_handle,
             return BLE_ATT_ERR_INVALID_ATTR_VALUE_LEN;
         }
         rc = os_mbuf_copydata(ctxt->om, 0, ctxt->om->om_len, custom_chr_val);
-        return rc == 0 ? 0 : BLE_ATT_ERR_UNLIKELY;
+        if (rc != 0) {
+            return BLE_ATT_ERR_UNLIKELY;
+        }
 
+        // Push to queue
+        ble_queue_item_t item = {0};
+        item.len = ctxt->om->om_len;
+        memcpy(item.data, custom_chr_val, item.len);
+        if (ble_rx_queue != NULL) {
+            xQueueSend(ble_rx_queue, &item, 0); // non-blocking send
+        }
+        return 0;
     default :
         return BLE_ATT_ERR_UNLIKELY;
     }
@@ -74,7 +116,7 @@ static int custom_chr_access(uint16_t conn_handle, uint16_t attr_handle,
  *      - Characteristic register event
  *      - Descriptor register event
  */
-void gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg)
+void gatt_service_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg)
 {
     /* Local variables */
     char buf[BLE_UUID_STR_LEN];

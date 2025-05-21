@@ -16,7 +16,7 @@
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
 /*--------------------------- STATIC FUNCTION PROTOTYPES ---------------------*/
 /*--------------------------- VARIABLES --------------------------------------*/
-static const char *TAG = "LED_RGB";
+static const char *TAG = "led_rgb";
 static uint8_t led_strip_pixels[LED_RGB_MAX * 3]; // RGB values for each LED
 static rmt_channel_handle_t led_chan = NULL;
 static rmt_encoder_handle_t led_encoder = NULL;

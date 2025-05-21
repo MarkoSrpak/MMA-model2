@@ -8,6 +8,8 @@
 #include "common.h"
 #include "gatt_svc.h"
 
+static const char *TAG = "NimBLE_GAP";
+
 /* Private function declarations */
 inline static void format_addr(char *addr_str, uint8_t addr[]);
 static void print_conn_desc(struct ble_gap_conn_desc *desc);

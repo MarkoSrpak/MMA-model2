@@ -79,7 +79,7 @@ static esp_err_t gps_decode(esp_gps_t *esp_gps, size_t len);
 static void esp_handle_uart_pattern(esp_gps_t *esp_gps);
 static void nmea_parser_task_entry(void *arg);
 /*--------------------------- VARIABLES --------------------------------------*/
-static const char *GPS_TAG = "nmea_parser";
+static const char *GPS_TAG = "gps";
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
 
 /**

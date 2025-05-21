@@ -24,7 +24,7 @@ static size_t rmt_encode_led_strip(rmt_encoder_t *encoder,
 static esp_err_t rmt_del_led_strip_encoder(rmt_encoder_t *encoder);
 static esp_err_t rmt_led_strip_encoder_reset(rmt_encoder_t *encoder);
 /*--------------------------- VARIABLES --------------------------------------*/
-static const char *TAG = "led_encoder";
+static const char *TAG = "led_strip_encoder";
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
 static size_t rmt_encode_led_strip(rmt_encoder_t *encoder,
                                    rmt_channel_handle_t channel,

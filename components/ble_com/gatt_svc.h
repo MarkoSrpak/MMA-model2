@@ -15,8 +15,9 @@
 #include "host/ble_gap.h"
 
 /* Public function declarations */
-void gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg);
+void gatt_service_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg);
 void gatt_svr_subscribe_cb(struct ble_gap_event *event);
 int gatt_svc_init(void);
+void send_ble_notification(const uint8_t *data, uint16_t len);
 
 #endif // GATT_SVR_H
