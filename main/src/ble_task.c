@@ -15,6 +15,7 @@
 
 #include "ble_task.h"
 #include "common.h"
+#include "data_queues.h"
 #include "gap.h"
 #include "gatt_svc.h"
 
@@ -38,13 +39,10 @@ static void nimble_host_task(void *param);
 static void ble_receive_task(void *param);
 static void ble_transmit_task(void *param);
 /*--------------------------- VARIABLES --------------------------------------*/
-QueueHandle_t ble_rx_queue;
-QueueHandle_t ble_tx_queue;
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
 
 static void ble_receive_task(void *param)
 {
-    ble_rx_queue = xQueueCreate(10, sizeof(ble_queue_item_t));
     ble_queue_item_t item;
     while (true) {
         if (xQueueReceive(ble_rx_queue, &item, portMAX_DELAY)) {
@@ -88,7 +86,6 @@ static void ble_receive_task(void *param)
 
 static void ble_transmit_task(void *param)
 {
-    ble_tx_queue = xQueueCreate(10, sizeof(ble_queue_item_t));
     ble_queue_item_t item;
     while (true) {
         if (xQueueReceive(ble_tx_queue, &item, portMAX_DELAY)) {

@@ -13,6 +13,7 @@
 #include "accel_task.h"
 #include "ble_task.h"
 #include "bme_task.h"
+#include "data_queues.h"
 #include "gps_task.h"
 #include "i2c.h"
 #include "led_rgb.h"
@@ -20,6 +21,7 @@
 #include "pwm.h"
 #include "sdcard_task.h"
 #include "sweat_sensor.h"
+#include "sweat_task.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
 /*--------------------------- STATIC FUNCTION PROTOTYPES ---------------------*/
@@ -28,18 +30,21 @@
 /*--------------------------- GLOBAL FUNCTIONS -------------------------------*/
 void app_main(void)
 {
+    init_queues();
     // Initialize the LED RGB module
     led_rgb_init();
     // sweat_init();
     mic_init();
     pwm_init(ID_BUZZER); // Initialize the buzzer
-    // Create a task for BME68x initialization
-    // xTaskCreate(bme68x_task, "BME68x Task", 4096, NULL, 5, NULL);
-    xTaskCreate(sdcard_task, "SD Card Task", 4096, NULL, 5, NULL);
-    // xTaskCreate(accelGY_task, "AccelGY Task", 4096, NULL, 5, NULL);
-    xTaskCreate(accel_task, "Accel Task", 4096, NULL, 5, NULL);
-
-    xTaskCreate(gps_task, "GPS Task", 4096, NULL, 5, NULL);
+    // Create tasks
+    xTaskCreatePinnedToCore(bme68x_task, "BME68x Task", 4096, NULL, 5, NULL, 1);
+    // xTaskCreatePinnedToCore(accelGY_task, "AccelGY Task", 4096, NULL, 5,
+    // NULL, 1);
+    xTaskCreatePinnedToCore(accel_task, "Accel Task", 4096, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(gps_task, "GPS Task", 4096, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(sweat_task, "Sweat Task", 4096, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(sdcard_task, "SD Card Task", 4096, NULL, 5, NULL,
+                            1);
     xTaskCreatePinnedToCore(ble_task, "GPS Task", 4096, NULL, 5, NULL, 0);
 
     // uint32_t ledId = 2; // Assuming a single LED for simplicity

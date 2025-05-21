@@ -5,6 +5,7 @@ idf_component_register(SRCS "main.c"
                             "src/accel_task.c"
                             "src/gps_task.c"
                             "src/ble_task.c"
+                            "src/sweat_task.c"
                     INCLUDE_DIRS "." "inc"
                     REQUIRES accel
                              accelGY
@@ -19,4 +20,5 @@ idf_component_register(SRCS "main.c"
                              pwm
                              sdspi
                              sweat_sensor
+                             data_queues
                              )

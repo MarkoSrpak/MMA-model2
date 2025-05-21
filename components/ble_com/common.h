@@ -31,17 +31,9 @@
 #include "nimble/nimble_port.h"
 #include "nimble/nimble_port_freertos.h"
 
+#include "data_queues.h"
+
 /* Defines */
 #define DEVICE_NAME "MMAmodel2"
-
-#define BLE_QUEUE_ITEM_MAX_LEN 20
-
-extern QueueHandle_t ble_rx_queue;
-extern QueueHandle_t ble_tx_queue;
-
-typedef struct {
-    uint8_t data[BLE_QUEUE_ITEM_MAX_LEN];
-    size_t len;
-} ble_queue_item_t;
 
 #endif // COMMON_H

@@ -38,7 +38,7 @@ void accelGY_task(void *pvParameters)
         // printf("Temp: %d\n", data.temp);
         // printf("Gyro: X=%d Y=%d Z=%d\n", data.gyro_x, data.gyro_y,
         // data.gyro_z);
-        printf("%d %d %d\n", data.gyro_x, data.gyro_y, data.gyro_z);
+        // printf("%d %d %d\n", data.gyro_x, data.gyro_y, data.gyro_z);
 
         vTaskDelay(pdMS_TO_TICKS(300));
     }

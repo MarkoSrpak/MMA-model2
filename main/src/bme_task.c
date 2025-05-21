@@ -13,6 +13,7 @@
 #include "bme68x.h"
 #include "bme68x_defs.h"
 #include "bme_task.h"
+#include "data_queues.h"
 #include "i2c.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 #define BME68X_I2C_ADDR       BME68X_I2C_ADDR_LOW // Use the lower I2C address
@@ -112,6 +113,8 @@ void bme68x_task(void *pvParameters)
     uint32_t del_period;
     uint8_t n_fields;
 
+    bme_data_t bme_data;
+
     while (true) {
         result = bme68x_set_op_mode(BME68X_FORCED_MODE, &bme68x);
         if (result != BME68X_OK) {
@@ -137,10 +140,17 @@ void bme68x_task(void *pvParameters)
         }
 
         if (n_fields) {
-            printf("%d(deg C), %lu(Pa), %lu(%%), %lu(ohm), 0x%x\n",
+            // This works cos we have integer values, should remain like that
+            bme_data.timestamp_ms = get_current_timestamp_ms();
+            bme_data.temperature_c = data.temperature;
+            bme_data.pressure_pa = data.pressure;
+            bme_data.humidity_pct = data.humidity;
+            bme_data.voc_ohm = data.gas_resistance;
+            xQueueOverwrite(bme_queue, &bme_data);
+            /*printf("%d(deg C), %lu(Pa), %lu(%%), %lu(ohm), 0x%x\n",
                    (data.temperature), (long unsigned int)data.pressure,
                    (long unsigned int)(data.humidity / 1000),
-                   (long unsigned int)data.gas_resistance, data.status);
+                   (long unsigned int)data.gas_resistance, data.status);*/
         }
         vTaskDelay(pdMS_TO_TICKS(BME68X_READ_PERIOD_MS));
     }

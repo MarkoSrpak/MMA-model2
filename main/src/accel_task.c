@@ -33,6 +33,8 @@ void accel_task(void *pvParameters)
     accel_data_t data;
     accel_init();
 
+    bool is_breaking = false;
+
     while (1) {
         accel_read(&data);
         /*
@@ -49,7 +51,12 @@ void accel_task(void *pvParameters)
             led_rgb_set_color(3, 255, 0, 0); // Red
             led_rgb_set_color(4, 255, 0, 0); // Red
             led_rgb_set_color(5, 255, 0, 0); // Red
-        } else {
+            is_breaking = true;
+        } else if (is_breaking) {
+            led_rgb_off(3);
+            led_rgb_off(4);
+            led_rgb_off(5);
+            is_breaking = false;
         }
         vTaskDelay(pdMS_TO_TICKS(300));
     }
