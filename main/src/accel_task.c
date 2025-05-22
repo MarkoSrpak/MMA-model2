@@ -199,6 +199,7 @@ void accel_task(void *pvParameters)
     xTaskCreatePinnedToCore(accel_fft_task, "Acel FFT Task", 4096, NULL, 5,
                             NULL, 1);
     bool is_breaking = false;
+    int counteric = 0;
     while (1) {
         if (xSemaphoreTake(accel_mutex, portMAX_DELAY) == pdTRUE) {
             accel_read(&data);
@@ -209,17 +210,22 @@ void accel_task(void *pvParameters)
                 data.accel_z);
                printf("Gyro: X=%d Y=%d Z=%d\n", data.gyro_x, data.gyro_y,
           data.gyro_z); printf("Mag: X=%d Y=%d Z=%d\n", data.mag_x, data.mag_y,
-          data.mag_z);
-       */
+          data.mag_z);*/
+        // printf("Magne: X=%d Y=%d Z=%d\n", data.mag_x, data.mag_y,
+        // data.mag_z);
+
         if (data.accel_x > 800 && data.accel_x < 1200 && data.accel_y < 500
-            && data.accel_z > 400 && data.accel_z < 1200) {
+            && data.accel_z > 150 && data.accel_z < 1200
+            && (data.accel_x * data.accel_x + data.accel_z * data.accel_z)
+                   > 1030 * 1030) {
             // breaking detected
             ESP_LOGI(TAG, "breaking detected");
             led_rgb_set_color(3, 255, 0, 0); // Red
             led_rgb_set_color(4, 255, 0, 0); // Red
             led_rgb_set_color(5, 255, 0, 0); // Red
             is_breaking = true;
-        } else if (is_breaking) {
+            counteric = 0;
+        } else if (is_breaking && counteric > 6) {
             led_rgb_off(3);
             led_rgb_off(4);
             led_rgb_off(5);
@@ -235,6 +241,7 @@ void accel_task(void *pvParameters)
             ESP_LOGI(TAG, "Tilt detected: %s",
                      cmd == INDICATOR_LEFT ? "LEFT" : "RIGHT");
         }
-        vTaskDelay(pdMS_TO_TICKS(333));
+        counteric++;
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

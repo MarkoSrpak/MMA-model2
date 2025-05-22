@@ -53,13 +53,13 @@ void sdcard_task(void *pvParameters)
 
     // sdspi_write_line("logs/logstart.txt", txBuffer, sizeof(txBuffer));
     // sdspi_read("logs/logstart.txt", rxBuffer, sizeof(rxBuffer));
-    sdspi_write_line("logs/wotlu.txt", txBuffer, sizeof(txBuffer));
-    sdspi_read("logs/wotlu.txt", rxBuffer, sizeof(rxBuffer));
+    sdspi_write_line("logs/start.txt", txBuffer, sizeof(txBuffer));
+    sdspi_read("logs/start.txt", rxBuffer, sizeof(rxBuffer));
     printf("Read from SD Card: %s\n", rxBuffer);
     // clang-format off
     char *header = "ts_ms,year,mon,day,hr,min,sec,lat,lon,speed,alt,temp_c,"
                      "pressure_pa,humidity_pct,voc_ohm,noise_energy,sweat_level,"
-                     "accel_freq,accel_ampl,accel_dir\n";
+                     "accel_freq,accel_ampl,accel_energy,accel_dir\n";
     //sdspi_write_line("logs/log.csv", header, strlen(header));
     // clang-format on
     gps_data_t gps_data = {0};
