@@ -35,9 +35,8 @@ void app_main(void)
     // Initialize the LED RGB module
     led_rgb_init();
     vTaskDelay(pdMS_TO_TICKS(100));
-    // sweat_init();
-    mic_init();
-    pwm_init(ID_BUZZER); // Initialize the buzzer
+    // Initialize the buzzer
+    pwm_init(ID_BUZZER);
     vTaskDelay(pdMS_TO_TICKS(100));
     // Create tasks
     xTaskCreatePinnedToCore(bme68x_task, "BME68x Task", 4096, NULL, 5, NULL, 1);
@@ -52,39 +51,15 @@ void app_main(void)
     vTaskDelay(pdMS_TO_TICKS(100));
     xTaskCreatePinnedToCore(sweat_task, "Sweat Task", 4096, NULL, 5, NULL, 1);
     vTaskDelay(pdMS_TO_TICKS(100));
-    xTaskCreatePinnedToCore(sdcard_task, "SD Card Task", 4096, NULL, 5, NULL,
-                            1);
+    xTaskCreatePinnedToCore(sdcard_task, "SD Card Task", 4096 * 2, NULL, 5,
+                            NULL, 1);
     vTaskDelay(pdMS_TO_TICKS(100));
     xTaskCreatePinnedToCore(ble_task, "GPS Task", 4096, NULL, 5, NULL, 0);
     vTaskDelay(pdMS_TO_TICKS(100));
 
-    // uint32_t ledId = 2; // Assuming a single LED for simplicity
-
-    while (true) {
-        /*   // Alternate between red, green, and blue
-           for (int ledId = 0; ledId < 9; ledId++) {
-               led_rgb_set_color(ledId, 255, 0, 0); // Red
-               vTaskDelay(pdMS_TO_TICKS(500));
-
-               led_rgb_set_color(ledId, 0, 255, 0); // Green
-               vTaskDelay(pdMS_TO_TICKS(500));
-
-               led_rgb_set_color(ledId, 0, 0, 255); // Blue
-               vTaskDelay(pdMS_TO_TICKS(500));
-
-               led_rgb_on(ledId); // White
-               vTaskDelay(pdMS_TO_TICKS(500));
-               // Turn the LED off
-               led_rgb_off(ledId);
-               vTaskDelay(pdMS_TO_TICKS(500));
-           }
-           // printf("Sweat sensor value: %d\n", sweat_read());
-           //  printf("Hello, FreeRTOS!\n");
-           // pwm_on_perc(ID_BUZZER, 50);
-           // vTaskDelay(pdMS_TO_TICKS(500));
-           // pwm_off(ID_BUZZER);*/
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        // printf("Mic sensor value: %d\n", mic_read());
-        // printf("%d\n", mic_read());
-    }
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    pwm_on_perc(ID_BUZZER, 50); // Turn on the buzzer at 50% duty cycle
+    vTaskDelay(pdMS_TO_TICKS(500));
+    pwm_off(ID_BUZZER); // Turn off the buzzer
+    vTaskDelete(NULL);
 }

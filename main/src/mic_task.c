@@ -25,6 +25,7 @@ static mic_data_t mic_data = {0};
 
 void mic_task(void *pvParameters)
 {
+    mic_init();
     uint16_t samples[MAX_SAMPLES];
     const int sample_count = MAX_SAMPLES;
 

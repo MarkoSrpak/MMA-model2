@@ -27,7 +27,7 @@ void init_queues(void)
     bme_queue = xQueueCreate(1, sizeof(bme_data_t));
     mic_queue = xQueueCreate(1, sizeof(mic_data_t));
     sweat_queue = xQueueCreate(1, sizeof(sweat_data_t));
-    accel_queue = xQueueCreate(1, sizeof(accel_data_t));
+    accel_queue = xQueueCreate(1, sizeof(accel_queue_data_t));
 
     // Larger depth for BLE queues
     sdcard_queue = xQueueCreate(10, sizeof(uint8_t));

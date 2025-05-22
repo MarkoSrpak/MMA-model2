@@ -51,11 +51,11 @@ void accel_read(accel_data_t *data)
     // Read 12 bytes from ACCEL_XOUT_H
     I2C_read(ACCEL_ADDR, raw, DATA_LEN);
 
-    buffer[0] = 0x11; // Write that we want to read from 2D
-    I2C_write(ACCEL_ADDR, buffer, 1);
-    uint8_t rawMag[6];
+    // buffer[0] = 0x11; // Write that we want to read from 0x11
+    // I2C_write(ACCEL_ADDR, buffer, 1);
+    uint8_t rawMag[6] = {0, 0, 0, 0, 0, 0};
     // Read 12 bytes from ACCEL_XOUT_H
-    I2C_read(ACCEL_ADDR, rawMag, DATA_LEN);
+    // I2C_read(ACCEL_ADDR, rawMag, DATA_LEN);
 
     // Combine high and low bytes (raw)
     int16_t raw_ax = (int16_t)(raw[0] << 8 | raw[1]);
@@ -83,6 +83,29 @@ void accel_read(accel_data_t *data)
     data->mag_x = rawMag_x;
     data->mag_y = rawMag_y;
     data->mag_z = rawMag_z;
+
+    return;
+}
+
+void accel_read_only_x(int16_t *accel_x)
+{
+    uint8_t raw[2];
+
+    // I2C_read_register(ACCEL_ADDR, 0x2D, raw, DATA_LEN);
+
+    uint8_t buffer[1] = {0x2D}; // Write that we want to read from 2D
+    I2C_write(ACCEL_ADDR, buffer, 1);
+
+    // Read 12 bytes from ACCEL_XOUT_H
+    I2C_read(ACCEL_ADDR, raw, 2);
+
+    // Combine high and low bytes (raw)
+    int16_t raw_ax = (int16_t)(raw[0] << 8 | raw[1]);
+
+    // Apply scaling
+    // Accelerometer: 16384 LSB/g → 1g = 1000 mg → 1 LSB = (1000/16384) mg ≈
+    // 0.061 mg To keep integer math: (raw * 1000) / 16384
+    *accel_x = (raw_ax * 1000) / 16384;
 
     return;
 }

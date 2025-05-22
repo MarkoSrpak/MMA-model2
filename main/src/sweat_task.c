@@ -22,6 +22,7 @@
 
 void sweat_task(void *pvParameters)
 {
+    sweat_init();
     const int window_size = MOVING_AVG_WINDOW;
     uint16_t readings[MOVING_AVG_WINDOW] = {0};
     int index = 0;
@@ -47,7 +48,7 @@ void sweat_task(void *pvParameters)
             .timestamp_ms = get_current_timestamp_ms(),
             .sweat_level = average,
         };
-
+        // printf("Sweat raw: %u\n", average);
         xQueueOverwrite(sweat_queue, &data); // overwrite with latest value
 
         vTaskDelay(pdMS_TO_TICKS(500));

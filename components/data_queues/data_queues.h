@@ -56,10 +56,11 @@ typedef struct {
 
 typedef struct {
     uint32_t timestamp_ms;
-    uint16_t freq;
-    uint16_t ampl;
+    float freq;
+    float ampl;
+    uint64_t accel_energy;
     uint16_t direction;
-} accel_data_t;
+} accel_queue_data_t;
 /*--------------------------- EXTERN -----------------------------------------*/
 extern QueueHandle_t gps_queue;
 extern QueueHandle_t bme_queue;

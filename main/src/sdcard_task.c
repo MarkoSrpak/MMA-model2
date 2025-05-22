@@ -17,14 +17,33 @@
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
 /*--------------------------- STATIC FUNCTION PROTOTYPES ---------------------*/
+static char random_letter();
+static void generate_random_filename(char *filename, size_t size);
 /*--------------------------- VARIABLES --------------------------------------*/
 static bool logging_active = false;
 static bool logging_paused = false;
 static char current_log_filename[64] = {0};
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
+static char random_letter()
+{
+    return '0' + (esp_random() % 10);
+}
+
+// Generate random filename: logs/workoutXXXXXX.txt
+static void generate_random_filename(char *filename, size_t size)
+{
+    char suffix[4];
+    for (int i = 0; i < 3; i++) {
+        suffix[i] = random_letter();
+    }
+    suffix[3] = '\0';
+
+    snprintf(filename, size, "logs/wo%s.txt", suffix);
+}
 /*--------------------------- GLOBAL FUNCTIONS -------------------------------*/
 void sdcard_task(void *pvParameters)
 {
+    vTaskDelay(pdMS_TO_TICKS(2000));
     // Initialize the SD card
     sdspi_init();
 
@@ -32,9 +51,10 @@ void sdcard_task(void *pvParameters)
     char txBuffer[128] = "SD Card started";
     char rxBuffer[128];
 
-    sdspi_write_line("logs/logstart.txt", txBuffer, sizeof(txBuffer));
-    sdspi_read("logs/logstart.txt", rxBuffer, sizeof(rxBuffer));
-
+    // sdspi_write_line("logs/logstart.txt", txBuffer, sizeof(txBuffer));
+    // sdspi_read("logs/logstart.txt", rxBuffer, sizeof(rxBuffer));
+    sdspi_write_line("logs/wotlu.txt", txBuffer, sizeof(txBuffer));
+    sdspi_read("logs/wotlu.txt", rxBuffer, sizeof(rxBuffer));
     printf("Read from SD Card: %s\n", rxBuffer);
     // clang-format off
     char *header = "ts_ms,year,mon,day,hr,min,sec,lat,lon,speed,alt,temp_c,"
@@ -46,21 +66,19 @@ void sdcard_task(void *pvParameters)
     bme_data_t bme_data = {0};
     mic_data_t mic_data = {0};
     sweat_data_t sweat_data = {0};
-    accel_data_t accel_data = {0};
+    accel_queue_data_t accel_data = {0};
 
     char logBuffer[512];
 
     while (1) {
         uint8_t cmd = 0;
         if (xQueueReceive(sdcard_queue, &cmd, 0)) {
+            vTaskDelay(pdMS_TO_TICKS(100));
             if (cmd == LOG_CMD_START) {
                 if (!logging_active) {
                     // Generate new file name
-                    uint32_t rand = esp_random();
-                    snprintf(current_log_filename, sizeof(current_log_filename),
-                             "logs/workout%lu.txt", rand);
-                    snprintf(current_log_filename, sizeof(current_log_filename),
-                             "logs/workout.txt");
+                    generate_random_filename(current_log_filename,
+                                             sizeof(current_log_filename));
                     sdspi_write_line(current_log_filename, header,
                                      strlen(header));
                     logging_active = true;
@@ -95,7 +113,7 @@ void sdcard_task(void *pvParameters)
 
             // clang-format off
             int len = snprintf(logBuffer, sizeof(logBuffer),
-                "%lu,%u,%u,%u,%u,%u,%u,%.5f,%.5f,%.2f,%.2f,%d,%lu,%lu,%lu,%lu,%u,%u,%u,%u\n",
+                "%lu,%u,%u,%u,%u,%u,%u,%.5f,%.5f,%.2f,%.2f,%d,%lu,%lu,%lu,%lu,%u,%.2f,%.2f,%llu,%u\n",
                 gps_data.timestamp_ms,
                 gps_data.year, gps_data.month, gps_data.day,
                 gps_data.hour, gps_data.minute, gps_data.second,
@@ -103,7 +121,7 @@ void sdcard_task(void *pvParameters)
                 bme_data.temperature_c, bme_data.pressure_pa, bme_data.humidity_pct, bme_data.voc_ohm,
                 mic_data.noise_energy,
                 sweat_data.sweat_level,
-                accel_data.freq, accel_data.ampl, accel_data.direction
+                accel_data.freq, accel_data.ampl, accel_data.accel_energy, accel_data.direction
             );
             // clang-format on
             if (len > 0 && len < sizeof(logBuffer)) {

@@ -54,6 +54,7 @@ dkms.conf
 # Aditional ignores
 .vscode/
 build/
+managed_components/
 sdkconfig
 sdkconfig.old
 dependencies.lock

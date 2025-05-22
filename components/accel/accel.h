@@ -26,5 +26,6 @@ typedef struct {
 /*--------------------------- GLOBAL FUNCTION PROTOTYPES ---------------------*/
 void accel_read(accel_data_t *data);
 void accel_init();
+void accel_read_only_x(int16_t *accel_x);
 
 #endif /*ACCEL_H*/
