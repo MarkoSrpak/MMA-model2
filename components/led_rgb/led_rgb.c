@@ -67,11 +67,11 @@ void led_rgb_set_color(uint32_t ledId, uint32_t r, uint32_t g, uint32_t b)
     }
 
     // Set RGB values for the specified LED
-    led_strip_pixels[ledId * 3 + 0] = g; // Green
-    led_strip_pixels[ledId * 3 + 1] = b; // Blue
-    led_strip_pixels[ledId * 3 + 2] = r; // Red
+    led_strip_pixels[ledId * 3 + 0] = r; // g; // Green
+    led_strip_pixels[ledId * 3 + 1] = g; // b; // Blue
+    led_strip_pixels[ledId * 3 + 2] = b; // r; // Red
 
-    ESP_LOGI(TAG, "Set LED %ld color to R:%ld G:%ld B:%ld", ledId, r, g, b);
+    // ESP_LOGI(TAG, "Set LED %ld color to R:%ld G:%ld B:%ld", ledId, r, g, b);
 
     // Transmit the current LED strip pixel values
     ESP_ERROR_CHECK(rmt_transmit(led_chan, led_encoder, led_strip_pixels,
@@ -79,7 +79,7 @@ void led_rgb_set_color(uint32_t ledId, uint32_t r, uint32_t g, uint32_t b)
     // Wait for transmission to complete, not necessary but could be a problem
     // if leds are updated too fast
     // ESP_ERROR_CHECK(rmt_tx_wait_all_done(led_chan, portMAX_DELAY));
-    ESP_LOGI(TAG, "Flushed LED values to strip");
+    // ESP_LOGI(TAG, "Flushed LED values to strip");
 }
 
 void led_rgb_set_color_hsv(uint32_t ledId, uint32_t h, uint32_t s, uint32_t v)
@@ -93,7 +93,8 @@ void led_rgb_set_color_hsv(uint32_t ledId, uint32_t h, uint32_t s, uint32_t v)
     led_strip_hsv2rgb(h, s, v, &r, &g, &b);
     led_rgb_set_color(ledId, r, g, b);
 
-    ESP_LOGI(TAG, "Set LED %ld color to HSV H:%ld S:%ld V:%ld", ledId, h, s, v);
+    // ESP_LOGI(TAG, "Set LED %ld color to HSV H:%ld S:%ld V:%ld", ledId, h, s,
+    // v);
 }
 
 void led_rgb_on(uint32_t ledId)
@@ -105,7 +106,7 @@ void led_rgb_on(uint32_t ledId)
 
     // Turn on the LED by setting it to white (full brightness)
     led_rgb_set_color(ledId, 255, 255, 255);
-    ESP_LOGI(TAG, "Turned on LED %ld", ledId);
+    // ESP_LOGI(TAG, "Turned on LED %ld", ledId);
 }
 
 void led_rgb_off(uint32_t ledId)
@@ -117,7 +118,7 @@ void led_rgb_off(uint32_t ledId)
 
     // Turn off the LED by setting RGB values to 0
     led_rgb_set_color(ledId, 0, 0, 0);
-    ESP_LOGI(TAG, "Turned off LED %ld", ledId);
+    // ESP_LOGI(TAG, "Turned off LED %ld", ledId);
 }
 
 void led_rgb_set_brightness(uint32_t ledId, uint32_t brightness)
