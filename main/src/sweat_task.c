@@ -30,8 +30,8 @@ void sweat_task(void *pvParameters)
 
     while (true) {
         uint16_t raw = (uint16_t)sweat_read();
-
-        // Update circular buffer and sum
+        // printf("Sweat raw: %u\n", raw);
+        //  Update circular buffer and sum
         sum -= readings[index];
         readings[index] = raw;
         sum += raw;

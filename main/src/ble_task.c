@@ -46,39 +46,46 @@ static void ble_receive_task(void *param)
     ble_queue_item_t item;
     while (true) {
         if (xQueueReceive(ble_rx_queue, &item, portMAX_DELAY)) {
-            // Handle received BLE data
             ESP_LOGI("BLE_RX", "Received %d bytes: %.*s", item.len, item.len,
                      item.data);
 
             if (item.len == 4 && memcmp(item.data, "help", 4) == 0) {
                 ESP_LOGI(TAG, "Help command received");
-                const char *commands[] = {"help-list commands",
-                                          "start-begin workout",
-                                          "stop-end workout"};
+                const char *commands[] = {
+                    "help-list commands", "start-begin workout",
+                    "pause-pause workout", "stop-end workout"};
                 for (int i = 0; i < sizeof(commands) / sizeof(commands[0]);
                      ++i) {
                     ble_queue_item_t response;
                     size_t len = strlen(commands[i]);
-                    if (len > BLE_QUEUE_ITEM_MAX_LEN) {
+                    if (len > BLE_QUEUE_ITEM_MAX_LEN)
                         len = BLE_QUEUE_ITEM_MAX_LEN;
-                    }
                     memcpy(response.data, commands[i], len);
                     response.len = len;
-                    if (ble_tx_queue != NULL) {
-                        xQueueSend(ble_tx_queue, &response, 0);
-                    }
+                    xQueueSend(ble_tx_queue, &response, 0);
                 }
+
             } else if (item.len == 5 && memcmp(item.data, "start", 5) == 0) {
                 ESP_LOGI(TAG, "Start command received");
-                // TODO: Start logic
+                int cmd = LOG_CMD_START;
+                xQueueSend(sdcard_queue, &cmd, 0);
+
+            } else if (item.len == 5 && memcmp(item.data, "pause", 5) == 0) {
+                ESP_LOGI(TAG, "Pause command received");
+                int cmd = LOG_CMD_PAUSE;
+                xQueueSend(sdcard_queue, &cmd, 0);
+
             } else if (item.len == 4 && memcmp(item.data, "stop", 4) == 0) {
                 ESP_LOGI(TAG, "Stop command received");
-                // TODO: Stop logic
+                int cmd = LOG_CMD_STOP;
+                xQueueSend(sdcard_queue, &cmd, 0);
+
             } else {
                 ESP_LOGW(TAG, "Unknown command received: %.*s", item.len,
                          item.data);
             }
         }
+
         vTaskDelay(pdMS_TO_TICKS(100));
     }
     vTaskDelete(NULL);

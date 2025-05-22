@@ -15,6 +15,7 @@ QueueHandle_t bme_queue;
 QueueHandle_t mic_queue;
 QueueHandle_t sweat_queue;
 QueueHandle_t accel_queue;
+QueueHandle_t sdcard_queue;
 QueueHandle_t ble_rx_queue;
 QueueHandle_t ble_tx_queue;
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
@@ -29,6 +30,7 @@ void init_queues(void)
     accel_queue = xQueueCreate(1, sizeof(accel_data_t));
 
     // Larger depth for BLE queues
+    sdcard_queue = xQueueCreate(10, sizeof(uint8_t));
     ble_rx_queue = xQueueCreate(10, sizeof(ble_queue_item_t));
     ble_tx_queue = xQueueCreate(10, sizeof(ble_queue_item_t));
 }

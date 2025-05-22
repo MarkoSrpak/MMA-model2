@@ -22,6 +22,7 @@
 /*--------------------------- TYPEDEFS AND STRUCTS ---------------------------*/
 /*--------------------------- STATIC FUNCTION PROTOTYPES ---------------------*/
 /*--------------------------- VARIABLES --------------------------------------*/
+static bool is_initalized = false;
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
 /*--------------------------- GLOBAL FUNCTIONS -------------------------------*/
 void I2C_write(uint8_t device_addr, uint8_t *data, uint32_t size)
@@ -50,6 +51,10 @@ esp_err_t I2C_read_register(uint8_t device_addr, uint8_t reg_addr,
 
 esp_err_t I2C_init(void)
 {
+    if (is_initalized) {
+        return ESP_OK;
+    }
+    is_initalized = true;
     int i2c_master_port = I2C_MASTER_NUM;
 
     i2c_config_t conf = {

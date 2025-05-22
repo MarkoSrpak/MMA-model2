@@ -87,12 +87,12 @@ void gps_task(void *pvParameters)
     /* register event handler for NMEA parser library */
     nmea_parser_add_handler(nmea_hdl, gps_event_handler, NULL);
     ESP_LOGI(TAG, "GPS task started");
-    vTaskDelete(NULL);
-    // this task never does anything
-    /*    while (1) {
-            vTaskDelay(600000 / portTICK_PERIOD_MS);
-        }
-    */
+    // vTaskDelete(NULL);
+    //  this task never does anything
+    while (1) {
+        vTaskDelay(600000 / portTICK_PERIOD_MS);
+    }
+
     /* unregister event handler */
     //  nmea_parser_remove_handler(nmea_hdl, gps_event_handler);
     /* deinit NMEA parser library */
