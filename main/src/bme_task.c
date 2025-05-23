@@ -15,6 +15,7 @@
 #include "bme_task.h"
 #include "data_queues.h"
 #include "i2c.h"
+#include "pwm.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 #define BME68X_I2C_ADDR       BME68X_I2C_ADDR_LOW // Use the lower I2C address
 #define BME68X_READ_PERIOD_MS 1000
@@ -29,6 +30,7 @@ static BME68X_INTF_RET_TYPE bme68x_write_fptr(uint8_t reg_addr,
 static void bme68x_delay_us_fptr(uint32_t period, void *intf_ptr);
 /*--------------------------- VARIABLES --------------------------------------*/
 static uint8_t dev_addr = BME68X_I2C_ADDR;
+static bool is_warned = false;
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
 static BME68X_INTF_RET_TYPE bme68x_read_fptr(uint8_t reg_addr,
                                              uint8_t *reg_data, uint32_t length,
@@ -151,6 +153,26 @@ void bme68x_task(void *pvParameters)
                    (data.temperature), (long unsigned int)data.pressure,
                    (long unsigned int)(data.humidity / 1000),
                    (long unsigned int)data.gas_resistance, data.status);*/
+            if (data.temperature > 3500 && data.humidity > 50 && !is_warned) {
+                printf("WARNING: Warm and humid weather. Avoid dehydration.\n");
+                is_warned = true;
+                pwm_on_perc(ID_BUZZER, 50);
+                vTaskDelay(pdMS_TO_TICKS(100));
+                pwm_off(ID_BUZZER);
+                vTaskDelay(pdMS_TO_TICKS(100));
+                pwm_on_perc(ID_BUZZER, 50);
+                vTaskDelay(pdMS_TO_TICKS(100));
+                pwm_off(ID_BUZZER);
+                vTaskDelay(pdMS_TO_TICKS(100));
+                pwm_on_perc(ID_BUZZER, 50);
+                vTaskDelay(pdMS_TO_TICKS(100));
+                pwm_off(ID_BUZZER);
+                ble_queue_item_t warn_data = {
+                    .data = "WARN:Warm and humid",
+                    .len = 19,
+                };
+                xQueueSend(ble_tx_queue, &warn_data, 0);
+            }
         }
         vTaskDelay(pdMS_TO_TICKS(BME68X_READ_PERIOD_MS));
     }

@@ -198,9 +198,18 @@ void accel_task(void *pvParameters)
                             NULL, 1);
     xTaskCreatePinnedToCore(accel_fft_task, "Acel FFT Task", 4096, NULL, 5,
                             NULL, 1);
-    bool is_breaking = false;
+    static bool is_breaking = false;
+    static bool leds_enabled = true;
+    int led_cmd = 0;
     int counteric = 0;
     while (1) {
+        if (xQueueReceive(led_cmd_queue, &led_cmd, 0) == pdTRUE) {
+            if (led_cmd == LOG_CMD_LEDT) {
+                leds_enabled = !leds_enabled;
+            }
+            ESP_LOGI(TAG, "LEDs %s", leds_enabled ? "ENABLED" : "DISABLED");
+        }
+
         if (xSemaphoreTake(accel_mutex, portMAX_DELAY) == pdTRUE) {
             accel_read(&data);
             xSemaphoreGive(accel_mutex);
@@ -217,7 +226,8 @@ void accel_task(void *pvParameters)
         if (data.accel_x > 800 && data.accel_x < 1200 && data.accel_y < 500
             && data.accel_z > 150 && data.accel_z < 1200
             && (data.accel_x * data.accel_x + data.accel_z * data.accel_z)
-                   > 1030 * 1030) {
+                   > 1030 * 1030
+            && leds_enabled) {
             // breaking detected
             ESP_LOGI(TAG, "breaking detected");
             led_rgb_set_color(3, 255, 0, 0); // Red
@@ -233,7 +243,7 @@ void accel_task(void *pvParameters)
         }
 
         if (!tilt_active && abs(data.accel_y) > 700 && abs(data.accel_x) < 900
-            && abs(data.accel_z) < 500) {
+            && abs(data.accel_z) < 500 && leds_enabled) {
             tilt_active = true;
             indicator_cmd_t cmd =
                 data.accel_y > 0 ? INDICATOR_RIGHT : INDICATOR_LEFT;

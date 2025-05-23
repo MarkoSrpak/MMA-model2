@@ -12,6 +12,7 @@
 #include "data_queues.h"
 #include "mic_task.h"
 #include "microphone.h"
+#include "pwm.h"
 /*--------------------------- MACROS AND DEFINES -----------------------------*/
 #define SAMPLE_INTERVAL_MS 2 // ~500 Hz
 #define SAMPLE_DURATION_MS 100
@@ -20,6 +21,7 @@
 /*--------------------------- STATIC FUNCTION PROTOTYPES ---------------------*/
 /*--------------------------- VARIABLES --------------------------------------*/
 static mic_data_t mic_data = {0};
+static bool is_warned = false;
 /*--------------------------- STATIC FUNCTIONS -------------------------------*/
 /*--------------------------- GLOBAL FUNCTIONS -------------------------------*/
 
@@ -49,6 +51,26 @@ void mic_task(void *pvParameters)
             energy += (uint32_t)((uint32_t)centered * (uint32_t)centered);
         }
         // printf("%ld\n", energy);
+        if (energy > 15000 && !is_warned) {
+            printf("WARNING: High noise level detected!\n");
+            is_warned = true;
+            pwm_on_perc(ID_BUZZER, 50);
+            vTaskDelay(pdMS_TO_TICKS(100));
+            pwm_off(ID_BUZZER);
+            vTaskDelay(pdMS_TO_TICKS(100));
+            pwm_on_perc(ID_BUZZER, 50);
+            vTaskDelay(pdMS_TO_TICKS(100));
+            pwm_off(ID_BUZZER);
+            vTaskDelay(pdMS_TO_TICKS(100));
+            pwm_on_perc(ID_BUZZER, 50);
+            vTaskDelay(pdMS_TO_TICKS(100));
+            pwm_off(ID_BUZZER);
+            ble_queue_item_t warn_data = {
+                .data = "WARN:Loud noise",
+                .len = 15,
+            };
+            xQueueSend(ble_tx_queue, &warn_data, 0);
+        }
         //  Step 4: Package and queue
         mic_data.timestamp_ms = get_current_timestamp_ms(),
         mic_data.noise_energy = energy;

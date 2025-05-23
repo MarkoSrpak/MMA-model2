@@ -53,7 +53,8 @@ static void ble_receive_task(void *param)
                 ESP_LOGI(TAG, "Help command received");
                 const char *commands[] = {
                     "help-list commands", "start-begin workout",
-                    "pause-pause workout", "stop-end workout"};
+                    "pause-pause workout", "stop-end workout",
+                    "ledt-toggle LEDs"};
                 for (int i = 0; i < sizeof(commands) / sizeof(commands[0]);
                      ++i) {
                     ble_queue_item_t response;
@@ -79,6 +80,11 @@ static void ble_receive_task(void *param)
                 ESP_LOGI(TAG, "Stop command received");
                 int cmd = LOG_CMD_STOP;
                 xQueueSend(sdcard_queue, &cmd, 0);
+
+            } else if (item.len == 4 && memcmp(item.data, "ledt", 4) == 0) {
+                ESP_LOGI(TAG, "Toggle LEDs command received");
+                int cmd = LOG_CMD_LEDT;
+                xQueueSend(led_cmd_queue, &cmd, 0);
 
             } else {
                 ESP_LOGW(TAG, "Unknown command received: %.*s", item.len,
