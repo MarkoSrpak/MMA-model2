@@ -224,9 +224,9 @@ void accel_task(void *pvParameters)
         // data.mag_z);
 
         if (data.accel_x > 800 && data.accel_x < 1200 && data.accel_y < 500
-            && data.accel_z > 150 && data.accel_z < 1200
+            && data.accel_z > 200 && data.accel_z < 1200
             && (data.accel_x * data.accel_x + data.accel_z * data.accel_z)
-                   > 1030 * 1030
+                   > 1035 * 1035
             && leds_enabled) {
             // breaking detected
             ESP_LOGI(TAG, "breaking detected");
